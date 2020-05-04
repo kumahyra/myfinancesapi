@@ -2,7 +2,7 @@ package br.com.systemasolution.myfinances.service.impl;
 
 import br.com.systemasolution.myfinances.exception.RegraNegocioException;
 import br.com.systemasolution.myfinances.model.entity.Lancamentos;
-import br.com.systemasolution.myfinances.model.entity.StatusLancamento;
+import br.com.systemasolution.myfinances.shared.enums.StatusLancamento;
 import br.com.systemasolution.myfinances.model.repository.LancamentoRepository;
 import br.com.systemasolution.myfinances.service.LancamentoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class LancamentoServiceImpl implements LancamentoService{
@@ -86,5 +87,10 @@ public class LancamentoServiceImpl implements LancamentoService{
             throw new RegraNegocioException("Informe um tipo de lançamento!");
         }
 
+    }
+
+    @Override
+    public Optional<Lancamentos> obterPorId(Long id) {
+        return lancamentoRepository.findById(id);
     }
 }

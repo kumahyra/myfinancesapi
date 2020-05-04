@@ -1,4 +1,4 @@
-package br.com.systemasolution.myfinances.model.entity;
+package br.com.systemasolution.myfinances.shared.enums;
 
 public enum StatusLancamento {
     PENDENTE,

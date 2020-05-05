@@ -1,25 +1,28 @@
 package br.com.systemasolution.myfinances.service;
 
-import br.com.systemasolution.myfinances.model.entity.Lancamentos;
+import br.com.systemasolution.myfinances.model.entity.Lancamento;
 import br.com.systemasolution.myfinances.shared.enums.StatusLancamento;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 public interface LancamentoService {
 
-    Lancamentos salvar(Lancamentos lancamentos);
+    Lancamento salvar(Lancamento lancamentos);
 
-    Lancamentos atualizar(Lancamentos lancamentos);
+    Lancamento atualizar(Lancamento lancamentos);
 
-    void deletar(Lancamentos lancamentos);
+    void deletar(Lancamento lancamentos);
 
-    List<Lancamentos> buscar(Lancamentos lancamentosFiltros);
+    List<Lancamento> buscar(Lancamento lancamentosFiltros);
 
-    void atualizarSatus(Lancamentos lancamentos, StatusLancamento statusLancamento);
+    void atualizarSatus(Lancamento lancamentos, StatusLancamento statusLancamento);
 
-    void validar(Lancamentos lancamentos);
+    void validar(Lancamento lancamentos);
 
-    Optional<Lancamentos> obterPorId(Long id);
+    Optional<Lancamento> obterPorId(Long id);
+
+    BigDecimal obterSaldoPorUsuario(Long id);
 
 }

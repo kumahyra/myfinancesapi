@@ -1,10 +1,11 @@
 package br.com.systemasolution.myfinances.service.impl;
 
 import br.com.systemasolution.myfinances.exception.RegraNegocioException;
-import br.com.systemasolution.myfinances.model.entity.Lancamentos;
+import br.com.systemasolution.myfinances.model.entity.Lancamento;
 import br.com.systemasolution.myfinances.shared.enums.StatusLancamento;
 import br.com.systemasolution.myfinances.model.repository.LancamentoRepository;
 import br.com.systemasolution.myfinances.service.LancamentoService;
+import br.com.systemasolution.myfinances.shared.enums.TipoLancamento;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -24,7 +25,7 @@ public class LancamentoServiceImpl implements LancamentoService{
 
     @Override
     @Transactional
-    public Lancamentos salvar(Lancamentos lancamentos) {
+    public Lancamento salvar(Lancamento lancamentos) {
         lancamentos.setStatus(StatusLancamento.PENDENTE);
         validar(lancamentos);
         return lancamentoRepository.save(lancamentos);
@@ -32,7 +33,7 @@ public class LancamentoServiceImpl implements LancamentoService{
 
     @Override
     @Transactional
-    public Lancamentos atualizar(Lancamentos lancamentos) {
+    public Lancamento atualizar(Lancamento lancamentos) {
         Objects.requireNonNull(lancamentos.getId());
         validar(lancamentos);
         return lancamentoRepository.save(lancamentos);
@@ -40,14 +41,14 @@ public class LancamentoServiceImpl implements LancamentoService{
 
     @Override
     @Transactional
-    public void deletar(Lancamentos lancamentos) {
+    public void deletar(Lancamento lancamentos) {
         Objects.requireNonNull(lancamentos.getId());
         lancamentoRepository.delete(lancamentos);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Lancamentos> buscar(Lancamentos lancamentosFiltros) {
+    public List<Lancamento> buscar(Lancamento lancamentosFiltros) {
         Example example = Example.of(lancamentosFiltros,
                 ExampleMatcher.matching()
                         .withIgnoreCase()
@@ -56,13 +57,13 @@ public class LancamentoServiceImpl implements LancamentoService{
     }
 
     @Override
-    public void atualizarSatus(Lancamentos lancamentos, StatusLancamento statusLancamento) {
+    public void atualizarSatus(Lancamento lancamentos, StatusLancamento statusLancamento) {
         lancamentos.setStatus(statusLancamento);
         atualizar(lancamentos);
     }
 
     @Override
-    public void validar(Lancamentos lancamentos) {
+    public void validar(Lancamento lancamentos) {
         if(lancamentos.getDescricao() == null || lancamentos.getDescricao().trim().equals("")){
             throw new RegraNegocioException("Informe uma descrição válida!");
         }
@@ -90,7 +91,24 @@ public class LancamentoServiceImpl implements LancamentoService{
     }
 
     @Override
-    public Optional<Lancamentos> obterPorId(Long id) {
+    public Optional<Lancamento> obterPorId(Long id) {
         return lancamentoRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal obterSaldoPorUsuario(Long id) {
+        BigDecimal receitas = lancamentoRepository.obterSaldoPorTipoDeLancamentoEUsuario(id, TipoLancamento.RECEITA);
+        BigDecimal despesas = lancamentoRepository.obterSaldoPorTipoDeLancamentoEUsuario(id, TipoLancamento.DESPESA);
+
+        if(receitas == null){
+            receitas = BigDecimal.ZERO;
+        }
+
+        if(despesas == null){
+            despesas = BigDecimal.ZERO;
+        }
+
+        return receitas.subtract(despesas);
     }
 }

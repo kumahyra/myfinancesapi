@@ -18,7 +18,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Lancamentos {
+public class Lancamento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

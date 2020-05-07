@@ -41,12 +41,13 @@ public class UsuarioResource {
     @PostMapping
     public ResponseEntity salvar(@RequestBody UsuarioDTO usuarioDTO){
 
-        Usuario usuario = modelMapper.map(usuarioDTO, Usuario.class);
-        /*Usuario usuario = Usuario.builder()
+        //Usuario usuario = modelMapper.map(usuarioDTO, Usuario.class);
+        Usuario usuario = Usuario.builder()
                 .nome(usuarioDTO.getNome())
                 .email(usuarioDTO.getEmail())
                 .senha(usuarioDTO.getSenha())
-                .build();*/
+                .build();
+
         try{
             Usuario usuarioSalvo = usuarioService.salvarUsuario(usuario);
             return new ResponseEntity(usuarioSalvo, HttpStatus.CREATED);

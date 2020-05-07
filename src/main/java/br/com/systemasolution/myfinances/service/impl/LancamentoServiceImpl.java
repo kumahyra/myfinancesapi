@@ -73,7 +73,7 @@ public class LancamentoServiceImpl implements LancamentoService{
         }
 
         if(lancamentos.getAno() == null || lancamentos.getAno().toString().length() != 4){
-            throw new RegraNegocioException("Informa um ano válido!");
+            throw new RegraNegocioException("Informe um ano válido!");
         }
 
         if(lancamentos.getUsuario() == null || lancamentos.getUsuario().getId() == null){

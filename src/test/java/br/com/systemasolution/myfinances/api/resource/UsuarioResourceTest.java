@@ -159,10 +159,10 @@ public class UsuarioResourceTest {
         String email = "usuario@email.com";
         String senha = "123";
 
+        //Mockito.doNothing().when(modelMapper).map(Mockito.any(UsuarioDTO.class), Mockito.any(Usuario.class));
         UsuarioDTO dto = UsuarioDTO.builder().email("usuario@email.com").senha("123").build();
         Usuario usuario = Usuario.builder().id(1l).email(email).senha(senha).build();
 
-        //Mockito.doNothing().when(modelMapper).map(dto, Usuario.class);
 
         Mockito.when( service.salvarUsuario(Mockito.any(Usuario.class)) ).thenReturn(usuario);
         String json = new ObjectMapper().writeValueAsString(dto);

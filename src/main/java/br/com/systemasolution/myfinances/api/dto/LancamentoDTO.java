@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LancamenosDTO {
+public class LancamentoDTO {
 
     private Long id;
     private String descricao;

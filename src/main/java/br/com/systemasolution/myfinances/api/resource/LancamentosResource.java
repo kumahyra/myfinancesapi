@@ -1,7 +1,7 @@
 package br.com.systemasolution.myfinances.api.resource;
 
 import br.com.systemasolution.myfinances.api.dto.AtualizaStatusDTO;
-import br.com.systemasolution.myfinances.api.dto.LancamenosDTO;
+import br.com.systemasolution.myfinances.api.dto.LancamentoDTO;
 import br.com.systemasolution.myfinances.exception.RegraNegocioException;
 import br.com.systemasolution.myfinances.model.entity.Lancamento;
 import br.com.systemasolution.myfinances.model.entity.Usuario;
@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,10 +57,17 @@ public class LancamentosResource {
         return ResponseEntity.ok(lancamentosList);
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity obterLancamento(@PathVariable("id") Long id){
+        return lancamentoService.obterPorId(id)
+                .map(lancamento ->  new ResponseEntity(converter(lancamento), HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity(HttpStatus.NOT_FOUND));
+    }
+
     @PostMapping
-    public ResponseEntity salvar(@RequestBody LancamenosDTO lancamenosDTO) {
+    public ResponseEntity salvar(@RequestBody LancamentoDTO lancamentoDTO) {
         try {
-            Lancamento lancamentosSalvo = lancamentoService.salvar(converter(lancamenosDTO));
+            Lancamento lancamentosSalvo = lancamentoService.salvar(converter(lancamentoDTO));
             return new ResponseEntity(lancamentosSalvo, HttpStatus.CREATED);
         } catch (RegraNegocioException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -67,10 +75,10 @@ public class LancamentosResource {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity atualizar(@PathVariable("id") Long id, @RequestBody LancamenosDTO lancamenosDTO) {
+    public ResponseEntity atualizar(@PathVariable("id") Long id, @RequestBody LancamentoDTO lancamentoDTO) {
         return lancamentoService.obterPorId(id).map(entity -> {
             try {
-                Lancamento lancamento = converter(lancamenosDTO);
+                Lancamento lancamento = converter(lancamentoDTO);
                 lancamento.setId(entity.getId());
 
                 lancamentoService.atualizar(lancamento);
@@ -82,7 +90,7 @@ public class LancamentosResource {
 
     }
 
-    @PutMapping("{id}/atualizar-status")
+        @PutMapping("{id}/atualizar-status")
     public ResponseEntity atualizarStatus(@PathVariable("id") Long id, @RequestBody AtualizaStatusDTO atualizaStatusDTO){
         return lancamentoService.obterPorId(id).map(entity -> {
             StatusLancamento statusLancamento = StatusLancamento.valueOf(atualizaStatusDTO.getStatus());
@@ -109,16 +117,36 @@ public class LancamentosResource {
         }).orElseGet(() -> new ResponseEntity("Lançamento não encontrado!", HttpStatus.BAD_REQUEST));
     }
 
-    private Lancamento converter(LancamenosDTO lancamenosDTO) {
+    private LancamentoDTO converter(Lancamento lancamento){
+        return
+                LancamentoDTO.builder()
+                .id(lancamento.getId())
+                .descricao(lancamento.getDescricao())
+                .valor(lancamento.getValor())
+                .mes(lancamento.getMes())
+                .ano(lancamento.getAno())
+                .status(lancamento.getStatus().name())
+                .tipo(lancamento.getTipo().name())
+                .usuario(lancamento.getUsuario().getId())
+                .build();
+    }
+
+    private Lancamento converter(LancamentoDTO lancamentoDTO) {
 
         Usuario usuario = usuarioService
-                .obterPorId(lancamenosDTO.getUsuario())
+                .obterPorId(lancamentoDTO.getUsuario())
                 .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado para o id informado!"));
 
-        Lancamento lancamentos = modelMapper.map(lancamenosDTO, Lancamento.class);
+        Lancamento lancamentos = modelMapper.map(lancamentoDTO, Lancamento.class);
         lancamentos.setUsuario(usuario);
-        lancamentos.setTipo(TipoLancamento.valueOf(lancamenosDTO.getTipo()));
-        lancamentos.setStatus(StatusLancamento.valueOf(lancamenosDTO.getStatus()));
+        lancamentos.setTipo(TipoLancamento.valueOf(lancamentoDTO.getTipo()));
+
+        if(lancamentoDTO.getId() == null){
+            lancamentos.setStatus(StatusLancamento.PENDENTE);
+        }else{
+            lancamentos.setStatus(StatusLancamento.valueOf(lancamentoDTO.getStatus()));
+        }
+        lancamentos.setDataCadastro(LocalDate.now());
 
         return lancamentos;
     }

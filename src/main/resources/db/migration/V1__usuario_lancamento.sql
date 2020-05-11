@@ -1,3 +1,7 @@
+--CREATE DATABASE myfinances;
+
+CREATE SCHEMA finances;
+
 CREATE TABLE finances.usuario
 (
   id bigserial NOT NULL PRIMARY KEY,
